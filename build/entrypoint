@@ -1,0 +1,56 @@
+#!/bin/bash
+do_services () {
+    action=${1:-stop}
+    service apache2 $action
+    service postgresql $action
+}
+
+cleanup() {
+    do_services stop
+    pgrep -P $$ | xargs kill -15 2>/dev/null
+    wait
+    exit $?
+}
+
+trap cleanup INT TERM
+
+do_services stop
+
+if [ -f "/var/moodledata/c10_instalado" ] ; then
+    echo "Encontrada instalacao do C10, reutilizando os dados"
+    rm -fr /var/moodledatac10
+    ln -s /var/moodledata /var/moodledatac10
+    do_services start
+else
+    echo "Instalacao nova do C10."
+    cd /var
+
+    echo "Criando moodledata"
+    mkdir -p moodledata
+    chown www-data.www-data moodledata
+
+    echo "Movendo dados para o moodledata"
+    mv moodledatac10/* moodledata/
+    mv moodledatac10/.htaccess moodledata/
+    touch moodledata/c10_instalado
+    rm -fr moodledatac10
+    ln -s moodledata moodledatac10
+
+    echo "Recriando banco de dados"
+    rm -fr /var/lib/postgresql/9.5/main/*
+    runuser postgres -c "/usr/lib/postgresql/9.5/bin/pg_ctl -D /var/lib/postgresql/9.5/main initdb"
+    do_services start
+    sleep 30
+    cat /c10.sql.dumpall | runuser postgres -c psql
+fi
+
+# Se não passar argumento então executa o cronjob do moodle
+if [ "x$@" == "x" ] ; then
+    while true ; do
+        runuser www-data -s /bin/bash -c "/usr/bin/php7.0 /var/www/html/c10/admin/cli/cron.php"
+        sleep 5
+    done
+# Caso contrário executa o argumento passado
+else
+    exec "$@"
+fi
