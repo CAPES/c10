@@ -1,14 +1,14 @@
 version: '3'
 services:
   c10:
-    image: capes/c10:rc1
+    image: capes/c10:rc3
+    build: ./build
     ports:
       - 80:80
     volumes:
       - moodledata:/var/moodledata
       - dbdata:/var/lib/postgresql/9.5/main
       - logs:/var/log
-    restart: always
 volumes:
   moodledata:
   dbdata:

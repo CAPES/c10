@@ -37,8 +37,9 @@ else
     ln -s moodledata moodledatac10
 
     echo "Recriando banco de dados"
-    rm -fr /var/lib/postgresql/10/main/*
-    runuser postgres -c "/usr/lib/postgresql/10/bin/pg_ctl -D /var/lib/postgresql/10/main initdb"
+    rm -fr /var/lib/postgresql/9.5/main/*
+    chown postgres.postgres /var/lib/postgresql/9.5/main
+    runuser postgres -c "/usr/lib/postgresql/9.5/bin/pg_ctl -D /var/lib/postgresql/9.5/main initdb"
     do_services start
     sleep 30
     cat /c10.sql.dumpall | runuser postgres -c psql
