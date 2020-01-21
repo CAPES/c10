@@ -9,6 +9,9 @@ services:
       - moodledata:/var/moodledata
       - dbdata:/var/lib/postgresql/9.5/main
       - logs:/var/log
+    environment:
+      - DBPASS=SenhaDoBancoPostgreSQL
+
 volumes:
   moodledata:
   dbdata:
