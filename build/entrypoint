@@ -37,12 +37,48 @@ else
     ln -s moodledata moodledatac10
 
     echo "Recriando banco de dados"
-    rm -fr /var/lib/postgresql/9.5/main/*
-    runuser postgres -c "/usr/lib/postgresql/9.5/bin/pg_ctl -D /var/lib/postgresql/9.5/main initdb"
+    PWDEFAULT=$(echo $RANDOM | md5sum | cut -c1-10)
+    PWDEFAULT=${1:-$RANDOM}
+    DBPASS=${1:-$PWDEFAULT}
+    export DBPASS
+    rm -fr /var/lib/postgresql/10/main/*
+    chown postgres.postgres /var/lib/postgresql/10/main
+    runuser postgres -c "/usr/lib/postgresql/10/bin/pg_ctl -D /var/lib/postgresql/10/main initdb"
     do_services start
     sleep 30
     cat /c10.sql.dumpall | runuser postgres -c psql
 fi
+
+echo "Criando arquivo config.php"
+echo "ALTER USER postgres WITH PASSWORD '${DBPASS}';" | runuser postgres -c psql
+cat > /var/www/html/c10/config.php <<_EOF
+<?php // Moodle configuration file
+unset(\$CFG);
+global \$CFG;
+\$CFG = new stdClass();
+\$CFG->dbtype    = 'pgsql';
+\$CFG->dblibrary = 'native';
+\$CFG->dbhost    = 'localhost';
+\$CFG->dbname    = 'c10';
+\$CFG->dbuser    = 'postgres';
+\$CFG->dbpass    = '$DBPASS';
+\$CFG->prefix    = 'mdl_';
+\$CFG->dboptions = array (
+  'dbpersist' => 0,
+  'dbport' => 5432,
+  'dbsocket' => '',
+);
+\$is_web=http_response_code()!==FALSE;
+if (\$is_web) {
+        \$CFG->wwwroot   = 'http://'.\$_SERVER["HTTP_HOST"].'/c10';
+} else {
+        \$CFG->wwwroot   = 'http://localhost/c10';
+}
+\$CFG->dataroot  = '/var/moodledatac10';
+\$CFG->admin     = 'admin';
+\$CFG->directorypermissions = 0777;
+require_once(__DIR__ . '/lib/setup.php');
+_EOF
 
 # Se não passar argumento então executa o cronjob do moodle
 if [ "x$@" == "x" ] ; then
