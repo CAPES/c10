@@ -1,0 +1,18 @@
+version: '3'
+services:
+  c10:
+    image: capes/c10
+    build: ./build
+    ports:
+      - 80:80
+    volumes:
+      - moodledata:/var/moodledata
+      - dbdata:/var/lib/postgresql/10/main
+      - logs:/var/log
+    environment:
+      - DBPASS=SenhaDoBancoPostgreSQL
+
+volumes:
+  moodledata:
+  dbdata:
+  logs:
