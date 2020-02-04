@@ -17,14 +17,20 @@ Neste repositório temos a imagem do curso Ciência é 10, pronto para uso. Abai
 
 ## Etapas:
 
- 1. Crie um diretório chamado C10 e entre nele
-    mkdir c10
-    cd c10
- 2. Baixar o arquivo docker-compose.yml modelo :
-    wget https://github.com/CAPES/c10/raw/master/docker-compose.yml
- 3. Editar o arquivo do docker-compose.yml e alterar a variável DBPASS para uma nova senha única
- 4. Usar o docker-compose para inicializar a imagem:
-    docker-compose up -d
+1. Crie um diretório chamado C10 e entre nele
+
+ > mkdir c10
+ > cd c10
+ 
+2. Baixar o arquivo docker-compose.yml modelo :
+
+> wget https://github.com/CAPES/c10/raw/master/docker-compose.yml
+
+3. Editar o arquivo do docker-compose.yml e alterar a variável DBPASS para uma nova senha única
+
+4. Usar o docker-compose para inicializar a imagem:
+
+> docker-compose up -d
 
 # Opção 2: Sem usar o Docker Compose
 
@@ -34,19 +40,21 @@ Neste repositório temos a imagem do curso Ciência é 10, pronto para uso. Abai
 
 ## Etapas:
 1. Criando os volumes a serem utilizados para persistir os dados:
-   docker volume create c10_moodledata
-   docker volume create c10_dbdata
-   docker volume create c10_logs
+
+> docker volume create c10_moodledata
+> docker volume create c10_dbdata
+> docker volume create c10_logs
+
 2. Inicializando o container, altere SenhaDoBanco para uma nova senha única:
-   docker run -it --name C10 -v c10_moodledata:/var/moodledata -v c10_dbdata:/var/lib/postgresql/10/main -v c10_logs:/var/log -p 80:80 capes/c10
-   docker run -it --name C10 -e DBPASS=SenhaDoBanco -v c10_moodledata:/var/moodledata -v c10_dbdata:/var/lib/postgresql/10/main -v c10_logs:/var/log -p  
-80:80 capes/c10
+
+> docker run -it --name C10 -e DBPASS=SenhaDoBanco -v c10_moodledata:/var/moodledata -v c10_dbdata:/var/lib/postgresql/10/main -v c10_logs:/var/log -p 80:80 capes/c10
+
 3. Inicializando o container em background:
-   docker run -itd --name C10 -v c10_moodledata:/var/moodledata -v c10_dbdata:/var/lib/postgresql/10/main -v c10_logs:/var/log -p 80:80 capes/c10
-   docker run -itd --name C10 -e DBPASS=SenhaDoBanco -v c10_moodledata:/var/moodledata -v c10_dbdata:/var/lib/postgresql/10/main -v c10_logs:/var/log -p
+
+> docker run -itd --name C10 -e DBPASS=SenhaDoBanco -v c10_moodledata:/var/moodledata -v c10_dbdata:/var/lib/postgresql/10/main -v c10_logs:/var/log -p 80:80 capes/c10
 
 # Testando o C10
 
 Acesse a local:  [http://localhost](http://localhost/)
-   Nome de usuário: admin
-   Senha: @Mudar2018
+Nome de usuário: admin
+Senha: @Mudar2018
