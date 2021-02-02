@@ -1,7 +1,7 @@
 version: '3'
 services:
   c10:
-    image: capes/c10
+    image: c10:uab
     build: ./build
     ports:
       - 80:80
