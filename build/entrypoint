@@ -49,6 +49,13 @@ else
     cat /c10.sql.dumpall | runuser postgres -c psql
 fi
 
+if [ ! -d "/var/www/html/c10/blocks/uabdatagatherer" ] ; then
+    unzip /uabdatagatherer.zip -d /var/www/html/c10/blocks/
+    chown -R www-data.www-data /var/www/html/c10/blocks/uabdatagatherer
+fi
+rm -f /uabdatagatherer.zip
+
+
 echo "Criando arquivo config.php"
 echo "ALTER USER postgres WITH PASSWORD '${DBPASS}';" | runuser postgres -c psql
 cat > /var/www/html/c10/config.php <<_EOF
